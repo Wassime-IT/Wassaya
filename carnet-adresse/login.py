@@ -1,113 +1,53 @@
+
+import os
 import tkinter as tk
 from tkinter import messagebox
-import json
-import os
-import hashlib
-import secrets
 
-from gui import main_app  # main_app(filename) accepte le fichier JSON spécifique
+from gui import main_app
+from db import (
+    init_db,
+    admin_exists,
+    authenticate_admin,
+    create_admin,
+    migrate_login_json,
+    get_db_path
+)
 
-LOGIN_DB = "login.json"
+DB_PATH = get_db_path()
 
-# =========================
-# Sécurité : hachage sha256 + sel
-# =========================
-def _hash_password(password: str, salt: str) -> str:
-    """Retourne le hash SHA-256 de (salt + password)."""
-    return hashlib.sha256((salt + password).encode("utf-8")).hexdigest()
-
-def _ensure_user_has_hash(user: dict) -> bool:
+def _startup_migrations():
     """
-    Compatibilité: si l'utilisateur est au format ancien (password en clair),
-    on le migre automatiquement vers (salt + password_hash).
-    Retourne True si une migration a eu lieu.
+    Optional: migrate old login.json admins into SQLite (once).
     """
-    if "password_hash" in user and "salt" in user:
-        return False
+    init_db(DB_PATH)
+    login_json = os.path.join(os.path.dirname(os.path.abspath(__file__)), "login.json")
+    # migrate login.json users into SQLite (idempotent)
+    if os.path.exists(login_json):
+        migrated = migrate_login_json(login_json, DB_PATH)
+        # if we imported at least one account, inform the user
+        if migrated:
+            try:
+                messagebox.showinfo("Migration", f"{migrated} compte(s) admin importé(s) depuis login.json.")
+            except Exception:
+                pass
 
-    plain = user.get("password")
-    if plain is None:
-        return False
-
-    salt = secrets.token_hex(16)
-    user["salt"] = salt
-    user["password_hash"] = _hash_password(str(plain), salt)
-    user.pop("password", None)
-    return True
-
-# =========================
-# Accès données (login.json)
-# =========================
-def load_users() -> list[dict]:
-    if not os.path.exists(LOGIN_DB) or os.path.getsize(LOGIN_DB) == 0:
-        return []
-    with open(LOGIN_DB, "r", encoding="utf-8") as f:
-        try:
-            data = json.load(f)
-            return data if isinstance(data, list) else []
-        except json.JSONDecodeError:
-            return []
-
-def save_users(users: list[dict]) -> None:
-    with open(LOGIN_DB, "w", encoding="utf-8") as f:
-        json.dump(users, f, indent=4, ensure_ascii=False)
-
-# =========================
-# Authentification ADMIN
-# =========================
-def authenticate_admin(username: str, password: str) -> tuple[bool, str | None, str | None]:
-    """
-    Retourne: (ok, contact_file, error_message)
-    - ok: True si authentifié ET admin
-    - contact_file: fichier json contacts à ouvrir
-    - error_message: message d'erreur si ok=False
-    """
-    users = load_users()
-    changed = False
-
-    for u in users:
-        if u.get("username") != username:
-            continue
-
-        if _ensure_user_has_hash(u):
-            changed = True
-
-        if not bool(u.get("is_admin", False)):
-            return False, None, "Accès réservé aux administrateurs."
-
-        salt = u.get("salt", "")
-        stored = u.get("password_hash", "")
-
-        if salt and stored and _hash_password(password, salt) == stored:
-            if changed:
-                save_users(users)
-            return True, u.get("contact_file"), None
-
-        return False, None, "Nom d'utilisateur ou mot de passe incorrect."
-
-    return False, None, "Nom d'utilisateur ou mot de passe incorrect."
-
-# =========================
-# Fenêtre Tkinter
-# =========================
 def login_window():
+    _startup_migrations()
+
     root = tk.Tk()
-    root.title("Connexion (Admin)")
-    root.geometry("340x210")
+    root.title("Connexion (Admins)")
+    root.geometry("360x250")
     root.resizable(False, False)
 
-    tk.Label(root, text="Nom d'utilisateur").pack(pady=(10, 3))
+    tk.Label(root, text="Nom d'utilisateur (admin)").pack(pady=6)
     entry_user = tk.Entry(root)
     entry_user.pack(pady=2)
 
-    tk.Label(root, text="Mot de passe").pack(pady=(8, 3))
+    tk.Label(root, text="Mot de passe").pack(pady=6)
     entry_pass = tk.Entry(root, show="*")
     entry_pass.pack(pady=2)
 
-    status = tk.Label(root, text="", fg="red")
-    status.pack(pady=(6, 0))
-
-    def login():
+    def do_login(event=None):
         username = entry_user.get().strip()
         password = entry_pass.get().strip()
 
@@ -115,39 +55,91 @@ def login_window():
             messagebox.showwarning("Attention", "Tous les champs sont obligatoires")
             return
 
-        ok, contact_file, err = authenticate_admin(username, password)
-        if ok and contact_file:
+        if authenticate_admin(username, password, DB_PATH):
             root.destroy()
-            main_app(contact_file)
+            main_app(username)  # Launch address book for this admin
+        else:
+            messagebox.showerror("Erreur", "Compte admin ou mot de passe incorrect")
+            entry_pass.delete(0, tk.END)
+            entry_user.focus()
+
+    def open_create_admin():
+        # If at least one admin exists, we do not allow creating new admins here
+        # (you can extend later if needed).
+        if admin_exists(DB_PATH):
+            messagebox.showinfo("Info", "Un compte admin existe déjà.\nCréez les autres admins via un script (create_admin.py).")
             return
 
-        status.config(text=err or "Échec de connexion.")
-        entry_pass.delete(0, tk.END)
-        entry_user.focus()
+        win = tk.Toplevel(root)
+        win.title("Créer le 1er admin")
+        win.geometry("360x260")
+        win.resizable(False, False)
 
-    def on_enter(_event):
-        login()
+        tk.Label(win, text="Créer le premier compte administrateur").pack(pady=8)
 
-    entry_user.bind("<Return>", on_enter)
-    entry_pass.bind("<Return>", on_enter)
+        tk.Label(win, text="Nom d'utilisateur").pack()
+        e_u = tk.Entry(win)
+        e_u.pack(pady=2)
 
+        tk.Label(win, text="Mot de passe").pack()
+        e_p1 = tk.Entry(win, show="*")
+        e_p1.pack(pady=2)
+
+        tk.Label(win, text="Confirmer mot de passe").pack()
+        e_p2 = tk.Entry(win, show="*")
+        e_p2.pack(pady=2)
+
+        def create():
+            u = e_u.get().strip()
+            p1 = e_p1.get().strip()
+            p2 = e_p2.get().strip()
+
+            if not u or not p1 or not p2:
+                messagebox.showwarning("Attention", "Tous les champs sont obligatoires")
+                return
+            if p1 != p2:
+                messagebox.showerror("Erreur", "Les mots de passe ne correspondent pas")
+                return
+
+            ok = create_admin(u, p1, DB_PATH, is_admin=True)
+            if ok:
+                messagebox.showinfo("Succès", "Admin créé. Vous pouvez vous connecter.")
+                win.destroy()
+                entry_user.delete(0, tk.END)
+                entry_pass.delete(0, tk.END)
+                entry_user.insert(0, u)
+                entry_pass.focus()
+            else:
+                messagebox.showerror("Erreur", "Nom d'utilisateur déjà utilisé")
+
+        tk.Button(win, text="Créer admin", width=20, bg="#28a745", fg="white", command=create).pack(pady=14)
+
+    # Buttons
     tk.Button(
         root,
         text="Se connecter",
-        width=20,
+        width=22,
         bg="#007bff",
         fg="white",
         font=("Helvetica", 11, "bold"),
-        command=login
-    ).pack(pady=16)
+        command=do_login
+    ).pack(pady=18)
 
-    tk.Label(
+    tk.Button(
         root,
-        text="Note : accès limité aux comptes admin.\nMots de passe stockés hachés (SHA-256 + sel).",
-        fg="#555555",
-        justify="center",
-        font=("Helvetica", 8)
-    ).pack(pady=(0, 8))
+        text="Créer le 1er admin",
+        width=22,
+        bg="#6c757d",
+        fg="white",
+        command=open_create_admin
+    ).pack(pady=2)
+
+    # Bind Enter
+    root.bind("<Return>", do_login)
+
+    # If no admin exists, suggest creating one
+    if not admin_exists(DB_PATH):
+        messagebox.showinfo("Initialisation", "Aucun admin trouvé.\nCliquez sur 'Créer le 1er admin'.")
 
     root.mainloop()
 

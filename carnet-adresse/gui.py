@@ -1,24 +1,44 @@
+
+import os
 import tkinter as tk
-from tkinter import ttk, messagebox
-from adressBook import AddressBook
+from tkinter import ttk, messagebox, filedialog
 import tkinter.font as tkFont
 
-def main_app(contact_file):
+from adressBook import AddressBook
+
+def _guess_legacy_json(username: str) -> str:
+    """
+    Tries to find legacy JSON contact file used by the old version:
+    - contact_<username>.json
+    - contact_user.json / contact_wassime.json ...
+    """
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    candidates = [
+        os.path.join(base_dir, f"contact_{username}.json"),
+        os.path.join(base_dir, "contact_user.json") if username == "user" else "",
+    ]
+    return next((c for c in candidates if c and os.path.exists(c)), "")
+
+def main_app(username: str):
     root = tk.Tk()
-    root.title("Carnet d'adresses")
-    root.geometry("720x520")
+    root.title(f"Carnet d'adresses - {username}")
+    root.geometry("780x560")
     root.resizable(False, False)
 
-    # ---------- Carnet spécifique ----------
-    book = AddressBook(contact_file)
+    # ---------- Carnet (SQLite) ----------
+    book = AddressBook(owner_username=username)
+
+    # Optional: migrate contacts from legacy JSON for this user (only if DB is empty)
+    legacy_json = _guess_legacy_json(username)
+    if legacy_json:
+        book.migrate_from_json_if_needed(legacy_json)
 
     # ---------- Fonctions ----------
     def afficher_contacts(contacts=None):
         tree.delete(*tree.get_children())
         if contacts is None:
-            contacts = book.contacts
+            contacts = book.get_all_contacts()
         for c in contacts:
-            # On stocke l'id en "iid" caché pour la sélection
             tree.insert("", tk.END, iid=c.id, values=(c.nom, c.prenom, c.email, c.phone))
 
     def clear_entries():
@@ -74,19 +94,20 @@ def main_app(contact_file):
             messagebox.showwarning("Erreur", "Tous les champs sont obligatoires")
             return
 
-        if book.update_contact(contact_id, new_nom, new_prenom, new_email, new_phone):
+        ok = book.update_contact(contact_id, new_nom, new_prenom, new_email, new_phone)
+        if ok:
             afficher_contacts()
             clear_entries()
             messagebox.showinfo("Succès", "Contact modifié")
         else:
-            messagebox.showerror("Erreur", "Modification échouée")
+            messagebox.showerror("Erreur", "Email/téléphone invalide ou contact introuvable")
 
     def on_tree_select(event):
         selected = tree.selection()
         if not selected:
             return
         contact_id = selected[0]
-        contact = next((c for c in book.contacts if c.id == contact_id), None)
+        contact = book.get_contact(contact_id)
         if contact:
             clear_entries()
             entry_nom.insert(0, contact.nom)
@@ -95,18 +116,25 @@ def main_app(contact_file):
             entry_phone.insert(0, contact.phone)
 
     def rechercher_contact(*args):
-        query = search_var.get().lower().strip()
+        query = search_var.get().strip()
         if not query:
             afficher_contacts()
             return
-        resultats = [
-            c for c in book.contacts
-            if query in c.nom.lower() 
-            or query in c.prenom.lower() 
-            or query in c.email.lower() 
-            or query in c.phone
-        ]
-        afficher_contacts(resultats)
+        afficher_contacts(book.search_contacts(query))
+
+    def exporter_csv():
+        filepath = filedialog.asksaveasfilename(
+            title="Exporter en CSV",
+            defaultextension=".csv",
+            filetypes=[("CSV", "*.csv")]
+        )
+        if not filepath:
+            return
+        try:
+            n = book.export_to_csv(filepath)
+            messagebox.showinfo("Export CSV", f"{n} contact(s) exporté(s) vers:\n{filepath}")
+        except Exception as e:
+            messagebox.showerror("Erreur export", str(e))
 
     # ---------- Frames ----------
     frame_form = tk.LabelFrame(root, text="Informations du contact", padx=10, pady=10)
@@ -123,27 +151,28 @@ def main_app(contact_file):
 
     # ---------- Formulaire ----------
     tk.Label(frame_form, text="Nom").grid(row=0, column=0, sticky="w")
-    entry_nom = tk.Entry(frame_form, width=30)
+    entry_nom = tk.Entry(frame_form, width=32)
     entry_nom.grid(row=0, column=1, pady=2)
 
     tk.Label(frame_form, text="Prénom").grid(row=1, column=0, sticky="w")
-    entry_prenom = tk.Entry(frame_form, width=30)
+    entry_prenom = tk.Entry(frame_form, width=32)
     entry_prenom.grid(row=1, column=1, pady=2)
 
     tk.Label(frame_form, text="Email").grid(row=2, column=0, sticky="w")
-    entry_email = tk.Entry(frame_form, width=30)
+    entry_email = tk.Entry(frame_form, width=32)
     entry_email.grid(row=2, column=1, pady=2)
 
     tk.Label(frame_form, text="Téléphone").grid(row=3, column=0, sticky="w")
-    entry_phone = tk.Entry(frame_form, width=30)
+    entry_phone = tk.Entry(frame_form, width=32)
     entry_phone.grid(row=3, column=1, pady=2)
 
     # ---------- Boutons ----------
     button_font = tkFont.Font(family="Helvetica", size=11, weight="bold")
-    tk.Button(frame_buttons, text="Ajouter", width=15, font=button_font, bg="#28a745", fg="white", command=ajouter_contact).grid(row=0, column=0, padx=5)
-    tk.Button(frame_buttons, text="Modifier", width=15, font=button_font, bg="#007bff", fg="white", command=modifier_contact).grid(row=0, column=1, padx=5)
-    tk.Button(frame_buttons, text="Supprimer", width=15, font=button_font, bg="#dc3545", fg="white", command=supprimer_contact).grid(row=0, column=2, padx=5)
-    tk.Button(frame_buttons, text="Quitter", width=15, font=button_font, bg="#6c757d", fg="white", command=root.quit).grid(row=0, column=3, padx=5)
+    tk.Button(frame_buttons, text="Ajouter", width=14, font=button_font, bg="#28a745", fg="white", command=ajouter_contact).grid(row=0, column=0, padx=5, pady=2)
+    tk.Button(frame_buttons, text="Modifier", width=14, font=button_font, bg="#007bff", fg="white", command=modifier_contact).grid(row=0, column=1, padx=5, pady=2)
+    tk.Button(frame_buttons, text="Supprimer", width=14, font=button_font, bg="#dc3545", fg="white", command=supprimer_contact).grid(row=0, column=2, padx=5, pady=2)
+    tk.Button(frame_buttons, text="Exporter CSV", width=14, font=button_font, bg="#17a2b8", fg="white", command=exporter_csv).grid(row=0, column=3, padx=5, pady=2)
+    tk.Button(frame_buttons, text="Quitter", width=14, font=button_font, bg="#6c757d", fg="white", command=root.quit).grid(row=0, column=4, padx=5, pady=2)
 
     # ---------- Recherche ----------
     tk.Label(frame_search, text="Rechercher").pack(anchor="w")
@@ -154,10 +183,10 @@ def main_app(contact_file):
 
     # ---------- Tableau ----------
     columns = ("Nom", "Prénom", "Email", "Téléphone")
-    tree = ttk.Treeview(frame_table, columns=columns, show="headings", height=12)
+    tree = ttk.Treeview(frame_table, columns=columns, show="headings", height=14)
     for col in columns:
         tree.heading(col, text=col)
-        tree.column(col, width=160)
+        tree.column(col, width=175)
     tree.pack(fill="both", expand=True)
     tree.bind("<<TreeviewSelect>>", on_tree_select)
 
