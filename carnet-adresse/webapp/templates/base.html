@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "Carnet d'adresse (Web)" }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+  <div class="nav">
+    <div>
+      <strong>Carnet d'adresse — Web</strong>
+      <span class="muted" style="margin-left:10px;">
+        {% if me %}Connecté: {{ me.first_name }} {{ me.last_name }} ({{ me.role }}){% else %}Non connecté{% endif %}
+      </span>
+    </div>
+    <div class="row">
+      {% if me %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        {% if me.role in ['admin','superadmin'] %}<a href="{{ url_for('admin_change_password') }}">Changer mot de passe</a>{% endif %}
+        {% if me.role == 'contact' %}<a href="{{ url_for('contact_profile') }}">Mon compte</a>{% endif %}
+        <a href="{{ url_for('logout') }}">Déconnexion</a>
+      {% else %}
+        <a href="{{ url_for('login') }}">Connexion</a>
+        <a href="{{ url_for('register') }}">Créer un compte</a>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for cat, msg in messages %}
+          <div class="flash {{ 'ok' if cat=='ok' else 'err' }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>

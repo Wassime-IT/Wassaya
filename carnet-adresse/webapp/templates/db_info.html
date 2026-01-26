@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>État de la base</h2>
+  <div class="grid">
+    <div class="card"><strong>Super-admins</strong><div class="muted">{{ counts.superadmins }}</div></div>
+    <div class="card"><strong>Admins</strong><div class="muted">{{ counts.admins }}</div></div>
+    <div class="card"><strong>Contacts</strong><div class="muted">{{ counts.contacts }}</div></div>
+    <div class="card"><strong>Rendez-vous</strong><div class="muted">{{ counts.appointments }}</div></div>
+  </div>
+  <div class="row" style="margin-top:10px;">
+    <a class="btn secondary" href="{{ url_for('superadmin_panel') }}">Retour</a>
+  </div>
+</div>
+{% endblock %}

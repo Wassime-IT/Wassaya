@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h2>Super-admin — Gestion</h2>
+      <p class="muted">Gérer les admins et consulter l'état de la base.</p>
+    </div>
+    <div class="row">
+      <a class="btn" href="{{ url_for('superadmin_create_admin') }}">Ajouter admin</a>
+      <a class="btn secondary" href="{{ url_for('superadmin_db_info') }}">Infos base</a>
+      <a class="btn secondary" href="{{ url_for('admin_panel') }}">Gérer contacts</a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Admins</h3>
+  <table>
+    <thead>
+      <tr><th>Rôle</th><th>Nom</th><th>Email</th><th>Téléphone</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+      {% for a in admins %}
+        <tr>
+          <td><span class="badge">{{ a.role }}</span></td>
+          <td>{{ a.first_name }} {{ a.last_name }}</td>
+          <td>{{ a.email }}</td>
+          <td>{{ a.phone }}</td>
+          <td>
+            <form method="post" action="{{ url_for('superadmin_delete_admin', user_id=a.id) }}" onsubmit="return confirm('Supprimer ce compte ?');" style="display:inline;">
+              <button class="btn danger" type="submit">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

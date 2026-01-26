@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  {% if mode == 'create' %}
+    <h2>Ajouter un contact</h2>
+  {% else %}
+    <h2>Modifier un contact</h2>
+  {% endif %}
+  <form method="post" class="grid">
+    <div><label>Nom</label><input name="last_name" value="{{ contact.last_name if contact else '' }}" required></div>
+    <div><label>Prénom</label><input name="first_name" value="{{ contact.first_name if contact else '' }}" required></div>
+    <div><label>Email</label>
+      {% if mode == 'create' %}
+        <input name="email" type="email" required>
+      {% else %}
+        <input type="email" value="{{ contact.email }}" disabled>
+      {% endif %}
+    </div>
+    <div><label>Téléphone</label><input name="phone" value="{{ contact.phone if contact else '' }}" required></div>
+    {% if mode == 'create' %}
+      <div><label>Mot de passe</label><input name="password" type="password" required></div>
+    {% endif %}
+    <div class="row" style="grid-column:1/-1;">
+      <button type="submit">{% if mode=='create' %}Créer{% else %}Enregistrer{% endif %}</button>
+      <a class="btn secondary" href="{{ url_for('admin_panel') }}">Retour</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

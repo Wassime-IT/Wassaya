@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <div class="row" style="justify-content:space-between;">
+    <div>
+      <h2>Contact — Mon espace</h2>
+      <p class="muted">Gérer mon compte et réserver un rendez-vous.</p>
+    </div>
+    <div class="row">
+      <a class="btn" href="{{ url_for('contact_new_appointment') }}">Réserver rendez-vous</a>
+      <a class="btn secondary" href="{{ url_for('contact_profile') }}">Mon profil</a>
+      <a class="btn secondary" href="{{ url_for('contact_change_password') }}">Mot de passe</a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h3>Mes rendez-vous</h3>
+  <table>
+    <thead><tr><th>Date/Heure</th><th>Statut</th><th>Note</th></tr></thead>
+    <tbody>
+      {% for a in appts %}
+        <tr>
+          <td>{{ a.scheduled_at }}</td>
+          <td><span class="badge">{{ a.status }}</span></td>
+          <td>{{ a.note or '' }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="3" class="muted">Aucun rendez-vous pour le moment.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

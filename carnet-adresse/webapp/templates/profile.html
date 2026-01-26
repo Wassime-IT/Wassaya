@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h2>Mon profil</h2>
+  <form method="post" class="grid">
+    <div><label>Nom</label><input value="{{ user.last_name }}" disabled></div>
+    <div><label>Prénom</label><input value="{{ user.first_name }}" disabled></div>
+    <div><label>Email</label><input value="{{ user.email }}" disabled></div>
+    <div><label>Téléphone</label><input name="phone" value="{{ user.phone }}" required></div>
+    <div class="row" style="grid-column:1/-1;">
+      <button type="submit">Enregistrer</button>
+      <a class="btn secondary" href="{{ url_for('contact_panel') }}">Retour</a>
+    </div>
+  </form>
+</div>
+{% endblock %}
