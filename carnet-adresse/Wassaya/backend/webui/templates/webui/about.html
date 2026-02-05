@@ -1,0 +1,90 @@
+{% extends "webui/base.html" %}
+{% block title %}À propos — Wassaya{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-9">
+
+    <div class="card">
+      <div class="card-body p-4 p-md-5">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+          <div>
+            <h2 class="mb-1">À propos de Wassaya</h2>
+            <div class="text-muted">
+              Wassaya facilite la prise de rendez-vous médical entre patients et médecins.
+            </div>
+          </div>
+          <span class="badge text-bg-light border">
+            <i class="bi bi-heart-pulse me-1"></i> Wassaya
+          </span>
+        </div>
+
+        <hr class="my-4">
+
+        <h5>Notre objectif</h5>
+        <p class="text-muted mb-4">
+          Offrir une expérience simple, rapide et sécurisée pour réserver un rendez-vous médical,
+          suivre son statut (PENDING, CONFIRMED, REJECTED) et recevoir des notifications par email.
+        </p>
+
+        <div class="row g-3 mb-4">
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100">
+              <div class="fw-semibold mb-1"><i class="bi bi-lightning-charge me-1"></i> Rapide</div>
+              <div class="text-muted small">Réservation en quelques clics, créneaux suggérés, statut clair.</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100">
+              <div class="fw-semibold mb-1"><i class="bi bi-shield-check me-1"></i> Sécurisé</div>
+              <div class="text-muted small">Accès par rôle (patient/docteur) et journalisation des emails.</div>
+            </div>
+          </div>
+          <div class="col-12 col-md-4">
+            <div class="p-3 bg-light rounded-3 h-100">
+              <div class="fw-semibold mb-1"><i class="bi bi-envelope-paper me-1"></i> Notifié</div>
+              <div class="text-muted small">Emails à la création et lors des changements de statut.</div>
+            </div>
+          </div>
+        </div>
+
+        <h5>Fonctionnalités principales</h5>
+        <ul class="text-muted">
+          <li>Recherche et consultation des médecins</li>
+          <li>Prise de RDV avec motif + validation future (datetime)</li>
+          <li>Confirmation / refus côté docteur</li>
+          <li>Export calendrier (.ics)</li>
+          <li>Historique et détail des emails (logs)</li>
+          <li>Mode sombre + interface moderne</li>
+        </ul>
+
+        <hr class="my-4">
+
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-primary" href="{% url 'doctor_list' %}">
+            <i class="bi bi-search me-1"></i> Voir les médecins
+          </a>
+          {% if request.user.is_authenticated %}
+            {% if request.user.role == "PATIENT" %}
+              <a class="btn btn-outline-secondary" href="{% url 'patient_dashboard' %}">
+                <i class="bi bi-speedometer2 me-1"></i> Mon dashboard
+              </a>
+            {% elif request.user.role == "DOCTOR" %}
+              <a class="btn btn-outline-secondary" href="{% url 'doctor_dashboard' %}">
+                <i class="bi bi-speedometer2 me-1"></i> Mon dashboard
+              </a>
+            {% endif %}
+          {% else %}
+            <a class="btn btn-outline-secondary" href="{% url 'login_view' %}">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+            </a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

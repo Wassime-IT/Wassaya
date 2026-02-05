@@ -1,0 +1,62 @@
+{% extends "webui/base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-md-8 col-lg-5">
+    <div class="card">
+      <div class="card-body p-4">
+
+        <div class="text-center mb-3">
+          <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center"
+               style="width:56px;height:56px;">
+            <i class="bi bi-shield-lock fs-3 text-primary"></i>
+          </div>
+          <h3 class="mt-3 mb-1">Connexion</h3>
+          <div class="text-muted">Accédez à votre espace Wassaya</div>
+        </div>
+
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <label class="form-label">Nom d’utilisateur</label>
+            <input type="text" name="username"
+                   class="form-control"
+                   placeholder="Votre username"
+                   value="{{ form.username.value|default_if_none:'' }}">
+            {% if form.username.errors %}
+              <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" name="password"
+                   class="form-control"
+                   placeholder="Votre mot de passe">
+            {% if form.password.errors %}
+              <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+            {% endif %}
+          </div>
+
+          <button class="btn btn-primary w-100" type="submit">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+          </button>
+
+          <div class="text-center mt-3">
+            <span class="text-muted small">Pas de compte ?</span>
+            <a href="{% url 'register_view' %}" class="small fw-semibold">Créer un compte</a>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

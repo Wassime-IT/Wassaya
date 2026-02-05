@@ -1,0 +1,232 @@
+/* backend/webui/static/webui/css/app.css */
+
+html, body { height: 100%; }
+
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+}
+
+/* =========================
+   BASE UI
+   ========================= */
+
+.card{ border-radius: 14px; }
+.table td, .table th{ white-space: nowrap; }
+
+.slot-btn{
+  min-width: 150px;
+  text-align: left;
+}
+
+.badge{ font-weight: 600; letter-spacing: .3px; }
+.btn{ border-radius: 10px; }
+
+/* Primary color */
+.btn-primary{ background-color: #4F46E5; border-color: #4F46E5; }
+.btn-primary:hover{ background-color: #4338CA; border-color: #4338CA; }
+
+/* Inputs */
+.form-control, .form-select{ border-radius: 8px; }
+.form-control:focus, .form-select:focus{
+  box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+  border-color: #4F46E5;
+}
+
+/* Old footer class (if any legacy pages use it) */
+.footer{
+  background-color: #F9FAFB;
+  padding: 1rem 0;
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6B7280;
+}
+.footer a{ color: #4F46E5; text-decoration: none; }
+.footer a:hover{ text-decoration: underline; }
+
+/* Footer links hover */
+footer a.text-muted:hover{
+  color: #0d6efd !important;
+}
+
+/* pre/code blocks */
+.ws-prewrap{
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* =========================
+   DARK MODE OVERRIDES
+   basé sur: html[data-theme="dark"]
+   ========================= */
+
+html[data-theme="dark"] body{
+  color: #e5e7eb;
+}
+
+/* Blocks (bg-light used in dashboards, etc.) */
+html[data-theme="dark"] .bg-light{
+  background-color: rgba(15,23,42,.65) !important;
+  border: 1px solid rgba(148,163,184,.14) !important;
+}
+
+/* Text muted */
+html[data-theme="dark"] .text-muted{
+  color: rgba(148,163,184,.90) !important;
+}
+
+/* Inputs/selects */
+html[data-theme="dark"] .form-control,
+html[data-theme="dark"] .form-select{
+  background-color: rgba(15,23,42,.75) !important;
+  color: #e5e7eb !important;
+  border-color: rgba(148,163,184,.20) !important;
+}
+html[data-theme="dark"] .form-control::placeholder{
+  color: rgba(148,163,184,.75) !important;
+}
+html[data-theme="dark"] .form-control:focus,
+html[data-theme="dark"] .form-select:focus{
+  box-shadow: 0 0 0 0.2rem rgba(96,165,250,.18) !important;
+  border-color: rgba(96,165,250,.55) !important;
+}
+
+/* Tables + table-light thead */
+html[data-theme="dark"] .table{ color: #e5e7eb !important; }
+html[data-theme="dark"] .table td,
+html[data-theme="dark"] .table th{
+  border-color: rgba(148,163,184,.18) !important;
+}
+html[data-theme="dark"] .table-light{
+  --bs-table-bg: rgba(15,23,42,.75) !important;
+  --bs-table-color: #e5e7eb !important;
+}
+
+/* Badges light */
+html[data-theme="dark"] .badge.text-bg-light{
+  background-color: rgba(148,163,184,.14) !important;
+  color: #e5e7eb !important;
+  border: 1px solid rgba(148,163,184,.18) !important;
+}
+
+/* Pagination */
+html[data-theme="dark"] .page-link{
+  background-color: rgba(15,23,42,.70) !important;
+  color: #e5e7eb !important;
+  border-color: rgba(148,163,184,.20) !important;
+}
+html[data-theme="dark"] .page-item.disabled .page-link{
+  color: rgba(148,163,184,.65) !important;
+  background-color: rgba(15,23,42,.45) !important;
+}
+html[data-theme="dark"] .page-link:hover{
+  background-color: rgba(148,163,184,.10) !important;
+}
+
+/* Dropdown menu */
+html[data-theme="dark"] .dropdown-menu{
+  background: rgba(17,24,39,.98) !important;
+  border-color: rgba(148,163,184,.18) !important;
+}
+html[data-theme="dark"] .dropdown-item{ color: #e5e7eb !important; }
+html[data-theme="dark"] .dropdown-item:hover{ background: rgba(148,163,184,.10) !important; }
+
+/* Outline buttons */
+html[data-theme="dark"] .btn-outline-secondary{
+  color: #e5e7eb !important;
+  border-color: rgba(148,163,184,.35) !important;
+}
+html[data-theme="dark"] .btn-outline-secondary:hover{
+  background: rgba(148,163,184,.10) !important;
+}
+
+html[data-theme="dark"] .btn-outline-dark{
+  color: #e5e7eb !important;
+  border-color: rgba(148,163,184,.35) !important;
+}
+html[data-theme="dark"] .btn-outline-dark:hover{
+  background: rgba(148,163,184,.10) !important;
+}
+
+/* nav-tabs readability in dark */
+html[data-theme="dark"] .nav-tabs{
+  border-bottom-color: rgba(148,163,184,.18) !important;
+}
+html[data-theme="dark"] .nav-tabs .nav-link{
+  color: rgba(229,231,235,.85) !important;
+  border-color: transparent !important;
+}
+html[data-theme="dark"] .nav-tabs .nav-link:hover{
+  border-color: rgba(148,163,184,.18) rgba(148,163,184,.18) transparent !important;
+}
+html[data-theme="dark"] .nav-tabs .nav-link.active{
+  background: rgba(17,24,39,.85) !important;
+  color: #e5e7eb !important;
+  border-color: rgba(148,163,184,.18) rgba(148,163,184,.18) transparent !important;
+}
+
+/* Email detail: pre inside alert more readable in dark */
+html[data-theme="dark"] .alert pre{
+  color: #f1f5f9 !important;
+}
+
+/* =========================
+   FIX TITRES INVISIBLES EN DARK
+   ========================= */
+
+html[data-theme="dark"] h1,
+html[data-theme="dark"] h2,
+html[data-theme="dark"] h3,
+html[data-theme="dark"] h4,
+html[data-theme="dark"] h5,
+html[data-theme="dark"] h6,
+html[data-theme="dark"] label{
+  color: #e5e7eb !important;
+}
+
+html[data-theme="dark"] .text-dark,
+html[data-theme="dark"] .text-body,
+html[data-theme="dark"] .link-dark,
+html[data-theme="dark"] .text-black,
+html[data-theme="dark"] .text-black-50{
+  color: #e5e7eb !important;
+}
+
+html[data-theme="dark"] .opacity-75,
+html[data-theme="dark"] .opacity-50,
+html[data-theme="dark"] .opacity-25{
+  opacity: 1 !important;
+}
+
+/* Links in content */
+html[data-theme="dark"] a{ color: #93c5fd; }
+html[data-theme="dark"] a:hover{ color: #bfdbfe; }
+
+/* =========================
+   FOOTER COMPACT (only when footer has .footer-compact)
+   ========================= */
+
+footer.footer-compact{
+  padding-top: .65rem !important;
+  padding-bottom: .65rem !important;
+}
+
+footer.footer-compact .small{
+  font-size: .82rem !important;
+}
+
+footer.footer-compact .vr{
+  margin-left: .4rem;
+  margin-right: .4rem;
+}
+
+footer.footer-compact .footer-links{
+  margin-left: 12px; /* 16px/20px si tu veux plus */
+}
+
+footer.footer-compact a.social i{
+  font-size: 1.05rem !important;
+}
+
+footer.footer-compact .container{
+  gap: .5rem !important;
+}

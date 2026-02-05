@@ -1,0 +1,24 @@
+================================================== 
+[04/02/2026 13:25:14,37] Running send_reminders... 
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions, wassaya_clinic, wassaya_rdv, wassaya_users
+Running migrations:
+  No migrations to apply.
+Reminders sent: 24h=0, 1h=0
+[04/02/2026 13:25:21,13] Done. 
+================================================== 
+[04/02/2026 13:31:25,31] Running send_reminders... 
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions, wassaya_clinic, wassaya_rdv, wassaya_users
+Running migrations:
+  No migrations to apply.
+Reminders sent: 24h=0, 1h=0
+[04/02/2026 13:31:31,26] Done. 
+================================================== 
+[06/02/2026  0:17:04,18] Running send_reminders... 
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions, wassaya_clinic, wassaya_rdv, wassaya_users
+Running migrations:
+  No migrations to apply.
+Reminders sent: 24h=0, 1h=0
+[06/02/2026  0:17:12,58] Done. 

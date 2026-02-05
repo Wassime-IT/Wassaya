@@ -1,0 +1,73 @@
+{% extends "webui/base.html" %}
+{% block title %}Politique de confidentialité — Wassaya{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-lg-9">
+
+    <div class="card">
+      <div class="card-body p-4 p-md-5">
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
+          <div>
+            <h2 class="mb-1">Politique de confidentialité</h2>
+            <div class="text-muted">Résumé clair sur l’utilisation des données dans Wassaya.</div>
+          </div>
+          <span class="badge text-bg-light border">
+            <i class="bi bi-shield-lock me-1"></i> Privacy
+          </span>
+        </div>
+
+        <hr class="my-4">
+
+        <h5>1) Données collectées</h5>
+        <p class="text-muted">
+          Wassaya peut collecter des informations liées au compte (nom, email), aux rendez-vous (date, statut, motif)
+          et aux notifications (logs d’emails) afin d’assurer le bon fonctionnement du service.
+        </p>
+
+        <h5>2) Finalité</h5>
+        <ul class="text-muted">
+          <li>Gestion des RDV (création, confirmation/refus, historique)</li>
+          <li>Envoi d’emails de notification</li>
+          <li>Amélioration du service et diagnostic technique (logs)</li>
+        </ul>
+
+        <h5>3) Conservation</h5>
+        <p class="text-muted">
+          Les données sont conservées le temps nécessaire au fonctionnement du service et au suivi des opérations.
+          Les logs techniques peuvent être conservés pour faciliter le support.
+        </p>
+
+        <h5>4) Partage</h5>
+        <p class="text-muted">
+          Les données ne sont pas vendues. Elles peuvent être accessibles uniquement aux rôles autorisés (patient/docteur/admin)
+          dans le cadre de la plateforme.
+        </p>
+
+        <h5>5) Sécurité</h5>
+        <p class="text-muted">
+          Accès contrôlé par authentification et séparation par rôles. Bonnes pratiques recommandées :
+          mot de passe fort, email valide, vigilance sur les appareils partagés.
+        </p>
+
+        <h5>6) Contact</h5>
+        <p class="text-muted mb-0">
+          Pour toute question : <b>support@wassaya.local</b>
+        </p>
+
+        <hr class="my-4">
+
+        <div class="d-flex flex-wrap gap-2">
+          <a class="btn btn-outline-secondary" href="{% url 'about_page' %}">
+            <i class="bi bi-info-circle me-1"></i> À propos
+          </a>
+          <a class="btn btn-primary" href="{% url 'contact_page' %}">
+            <i class="bi bi-envelope me-1"></i> Contact
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

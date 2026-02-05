@@ -1,0 +1,49 @@
+{% extends "email/base_email.html" %}
+
+{% block content %}
+  <p style="color:#333;margin:0 0 10px;">
+    Bonjour Dr <b>{{ doctor_name }}</b>,
+  </p>
+
+  <p style="color:#555;margin:0 0 14px;">
+    Une nouvelle demande de rendez-vous a été reçue.
+  </p>
+
+  <div style="background:#f2f6ff;border-radius:12px;padding:14px;margin:14px 0;">
+    <p style="margin:6px 0;"><b>Patient :</b> {{ patient_name }}</p>
+    <p style="margin:6px 0;"><b>Date :</b> {{ dt }}</p>
+    <p style="margin:6px 0;"><b>Motif :</b> {{ reason|default:"-" }}</p>
+  </div>
+
+  <div style="margin-top:12px;">
+    {% if doctor_rdvs_url %}
+      <a href="{{ doctor_rdvs_url }}"
+         style="display:inline-block;background:#0b5ed7;color:#ffffff!important;text-decoration:none;
+                padding:10px 14px;border-radius:10px;font-weight:800;margin-right:8px;">
+        Voir mes RDV
+      </a>
+    {% endif %}
+
+    {% if confirm_url %}
+      <a href="{{ confirm_url }}"
+         style="display:inline-block;background:#198754;color:#ffffff!important;text-decoration:none;
+                padding:10px 14px;border-radius:10px;font-weight:800;margin-right:8px;">
+        Confirmer
+      </a>
+    {% endif %}
+
+    {% if reject_url %}
+      <a href="{{ reject_url }}"
+         style="display:inline-block;background:#dc3545;color:#ffffff!important;text-decoration:none;
+                padding:10px 14px;border-radius:10px;font-weight:800;">
+        Refuser
+      </a>
+    {% endif %}
+  </div>
+
+  <p style="color:#777;margin:12px 0 0;font-size:13px;">
+    Si les boutons ne fonctionnent pas, ouvrez votre tableau de bord et traitez la demande depuis la liste des rendez-vous.
+  </p>
+{% endblock %}
+<!-- End of file backend/webui/templates/email/doctor_new_request.html -->
+ 

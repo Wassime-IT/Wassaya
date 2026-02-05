@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="fr">
+  <body style="margin:0;padding:0;background:#f6f7fb;font-family:Arial,sans-serif;">
+    <div style="padding:20px;">
+      <div style="max-width:680px;margin:0 auto;">
+
+        <!-- Header -->
+        <div style="background:#0b5ed7;border-radius:14px 14px 0 0;padding:16px 18px;color:#ffffff;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="font-size:18px;font-weight:800;letter-spacing:.2px;">
+              Wassaya Clinic
+            </div>
+
+            {% if badge_text %}
+              <span style="
+                display:inline-block;
+                padding:6px 10px;
+                border-radius:999px;
+                font-size:12px;
+                font-weight:800;
+                text-transform:uppercase;
+                border:1px solid rgba(255,255,255,.25);
+                background:{{ badge_bg|default:'#ffffff' }};
+                color:{{ badge_color|default:'#0b5ed7' }};
+              ">
+                {{ badge_text }}
+              </span>
+            {% endif %}
+          </div>
+
+          {% if email_title %}
+            <div style="margin-top:8px;font-size:14px;opacity:.95;">
+              {{ email_title }}
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Body -->
+        <div style="background:#ffffff;border:1px solid #eeeeee;border-top:0;border-radius:0 0 14px 14px;padding:20px 18px;">
+          {% block content %}{% endblock %}
+
+          <hr style="border:0;border-top:1px solid #eeeeee;margin:18px 0;" />
+          <div style="color:#999999;font-size:12px;line-height:1.5;">
+            Wassaya Clinic — Notification automatique<br/>
+            Si vous n’êtes pas concerné, vous pouvez ignorer ce message.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </body>
+</html>
+<!-- End of file backend/webui/templates/email/base_email.html -->
+ 

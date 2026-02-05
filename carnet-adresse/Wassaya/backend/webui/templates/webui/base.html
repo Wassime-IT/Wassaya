@@ -1,0 +1,396 @@
+{% load static %}
+<!doctype html>
+<html lang="fr" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{% block title %}Wassaya{% endblock %}</title>
+
+  <!-- Bootstrap 5.3 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+
+  <!-- Ton CSS -->
+  <link rel="stylesheet" href="{% static 'webui/css/app.css' %}">
+
+  {% block extra_head %}{% endblock %}
+
+  <style>
+    /* ===== THEME VARIABLES ===== */
+    :root{
+      --bg: #f6f7fb;
+      --text: #0f172a;
+      --muted: #64748b;
+      --card: rgba(255,255,255,.92);
+      --border: rgba(2,6,23,.10);
+      --shadow: 0 6px 18px rgba(18, 38, 63, .06);
+      --link: #0d6efd;
+    }
+
+    [data-theme="dark"]{
+      --bg: #0b1220;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --card: rgba(17,24,39,.85);
+      --border: rgba(148,163,184,.18);
+      --shadow: 0 10px 26px rgba(0,0,0,.35);
+      --link: #60a5fa;
+    }
+
+    body{
+      background: var(--bg);
+      color: var(--text);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Cards / navbar / buttons */
+    .card { border: 0; box-shadow: var(--shadow); border-radius: 14px; background: var(--card); }
+    .navbar { box-shadow: var(--shadow); }
+    .badge-soft { padding: .35rem .55rem; border-radius: 999px; font-weight: 600; }
+    .table > :not(caption) > * > * { padding: .85rem .85rem; }
+    .btn { border-radius: 10px; }
+
+    /* ===== ANIMATED BACKGROUND (bubbles) ===== */
+    .bg-bubbles{
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(37,99,235,.15), transparent 60%),
+                  radial-gradient(900px 600px at 85% 20%, rgba(59,130,246,.12), transparent 55%),
+                  radial-gradient(900px 700px at 50% 90%, rgba(99,102,241,.10), transparent 60%);
+    }
+
+    [data-theme="dark"] .bg-bubbles{
+      background: radial-gradient(1200px 800px at 15% 10%, rgba(37,99,235,.20), transparent 60%),
+                  radial-gradient(900px 600px at 85% 20%, rgba(59,130,246,.18), transparent 55%),
+                  radial-gradient(900px 700px at 50% 90%, rgba(99,102,241,.14), transparent 60%);
+    }
+
+    .bubble{
+      position: absolute;
+      width: var(--s);
+      height: var(--s);
+      border-radius: 999px;
+      left: var(--x);
+      top: var(--y);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.55), rgba(255,255,255,0) 55%),
+                  rgba(59,130,246,.14);
+      filter: blur(.2px);
+      opacity: .75;
+      animation: floaty var(--d) ease-in-out infinite;
+    }
+
+    [data-theme="dark"] .bubble{
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.18), rgba(255,255,255,0) 60%),
+                  rgba(96,165,250,.12);
+      opacity: .85;
+    }
+
+    @keyframes floaty{
+      0%   { transform: translate(0,0) scale(1); }
+      50%  { transform: translate(var(--dx), var(--dy)) scale(1.05); }
+      100% { transform: translate(0,0) scale(1); }
+    }
+
+    /* ===== Dark tweaks for bootstrap classes ===== */
+    [data-theme="dark"] .bg-white{ background-color: rgba(17,24,39,.85) !important; }
+    [data-theme="dark"] .text-muted{ color: var(--muted) !important; }
+    [data-theme="dark"] .border-top{ border-top-color: var(--border) !important; }
+    [data-theme="dark"] .dropdown-menu{ background: rgba(17,24,39,.98); border-color: var(--border); }
+    [data-theme="dark"] .dropdown-item{ color: var(--text); }
+    [data-theme="dark"] .dropdown-item:hover{ background: rgba(148,163,184,.10); }
+    [data-theme="dark"] .nav-link{ color: rgba(229,231,235,.92) !important; }
+    [data-theme="dark"] .navbar-brand{ color: rgba(229,231,235,.98) !important; }
+
+    /* Footer icons hover */
+    footer a.social{
+      color: var(--muted);
+      transition: transform .15s ease, color .15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+    }
+    footer a.social:hover{
+      color: var(--link);
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body class="d-flex flex-column min-vh-100">
+
+<!-- Background animated bubbles -->
+<div class="bg-bubbles" aria-hidden="true">
+  <span class="bubble" style="--s: 120px; --x: 8%;  --y: 20%; --dx: 35px; --dy: -25px; --d: 10s;"></span>
+  <span class="bubble" style="--s: 80px;  --x: 22%; --y: 70%; --dx: -30px; --dy: 20px; --d: 12s;"></span>
+  <span class="bubble" style="--s: 160px; --x: 78%; --y: 18%; --dx: -40px; --dy: 30px; --d: 14s;"></span>
+  <span class="bubble" style="--s: 95px;  --x: 88%; --y: 62%; --dx: 25px;  --dy: -35px; --d: 11s;"></span>
+  <span class="bubble" style="--s: 60px;  --x: 55%; --y: 40%; --dx: -22px; --dy: -18px; --d: 9s;"></span>
+  <span class="bubble" style="--s: 140px; --x: 40%; --y: 10%; --dx: 30px;  --dy: 40px; --d: 16s;"></span>
+</div>
+
+<nav class="navbar navbar-expand-lg bg-white sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" href="{% url 'home_page' %}">
+      <i class="bi bi-heart-pulse me-1"></i> Wassaya
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navMain">
+      <ul class="navbar-nav me-auto">
+
+        <!-- Public -->
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'doctor_list' %}">
+            <i class="bi bi-search me-1"></i> Médecins
+          </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'about_page' %}">
+              <i class="bi bi-info-circle me-1"></i> À propos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'contact_page' %}">
+              <i class="bi bi-envelope me-1"></i> Contact
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'privacy_page' %}">
+              <i class="bi bi-shield-lock me-1"></i> Confidentialité
+            </a>
+          </li>
+
+        <!-- PATIENT -->
+        {% if request.user.is_authenticated and request.user.role == "PATIENT" %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'patient_rdvs' %}">
+              <i class="bi bi-calendar-check me-1"></i> Mes RDV
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'patient_dashboard' %}">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'patient_email_logs' %}">
+              <i class="bi bi-envelope-paper me-1"></i> Emails
+            </a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="{% url 'about_page' %}">
+                <i class="bi bi-info-circle me-1"></i> À propos
+              </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'about_page' %}">
+              <i class="bi bi-info-circle me-1"></i> À propos
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'contact_page' %}">
+              <i class="bi bi-envelope me-1"></i> Contact
+            </a>
+          </li>
+
+
+        {% endif %}
+
+        <!-- DOCTOR -->
+        {% if request.user.is_authenticated and request.user.role == "DOCTOR" %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'doctor_rdvs' %}">
+              <i class="bi bi-calendar2-week me-1"></i> RDV (Docteur)
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'doctor_dashboard' %}">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'doctor_email_logs' %}">
+              <i class="bi bi-envelope-paper me-1"></i> Emails
+            </a>
+          </li>
+        {% endif %}
+
+        <!-- STAFF -->
+        {% if request.user.is_staff %}
+          <li class="nav-item">
+            <a class="nav-link" href="/admin/">
+              <i class="bi bi-shield-lock me-1"></i> Admin
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+
+      <ul class="navbar-nav ms-auto align-items-center">
+        <!-- Theme toggle -->
+        <li class="nav-item me-2">
+          <button class="btn btn-outline-secondary btn-sm" id="themeToggle" type="button" title="Mode sombre">
+            <i class="bi bi-moon-stars"></i>
+          </button>
+        </li>
+
+        {% if request.user.is_authenticated %}
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <i class="bi bi-person-circle me-1"></i> {{ request.user.username }}
+            </a>
+
+            <ul class="dropdown-menu dropdown-menu-end">
+              {% if request.user.role == "PATIENT" %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'patient_dashboard' %}">
+                    <i class="bi bi-person-badge me-2"></i> Mon espace
+                  </a>
+                </li>
+              {% elif request.user.role == "DOCTOR" %}
+                <li>
+                  <a class="dropdown-item" href="{% url 'doctor_dashboard' %}">
+                    <i class="bi bi-person-badge me-2"></i> Mon espace
+                  </a>
+                </li>
+              {% else %}
+                <li>
+                  <a class="dropdown-item" href="/admin/">
+                    <i class="bi bi-person-badge me-2"></i> Mon espace
+                  </a>
+                </li>
+              {% endif %}
+
+              <li><hr class="dropdown-divider"></li>
+
+              <li>
+                <a class="dropdown-item text-danger" href="{% url 'logout_view' %}">
+                  <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
+                </a>
+              </li>
+            </ul>
+          </li>
+
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'login_view' %}">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Connexion
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="btn btn-primary ms-lg-2" href="{% url 'register_view' %}">
+              <i class="bi bi-person-plus me-1"></i> Inscription
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4 flex-grow-1">
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="py-4 border-top bg-white mt-auto footer-compact">
+  <div class="container d-flex flex-column flex-md-row align-items-center justify-content-between gap-2">
+
+    <div class="text-muted small">
+      © {% now "Y" %} Wassaya — Plateforme de prise de rendez-vous
+    </div>
+
+    <div class="d-flex align-items-center gap-3 flex-wrap justify-content-center">
+      <div class="text-muted small">
+        <i class="bi bi-envelope me-1"></i> Support :
+        <span class="fw-semibold">support@wassaya.local</span>
+      </div>
+
+      <div class="vr d-none d-md-block"></div>
+
+      <!-- Réseaux sociaux -->
+      <div class="d-flex align-items-center gap-2">
+        <a class="social" href="#" target="_blank" rel="noopener" aria-label="Facebook" title="Facebook">
+          <i class="bi bi-facebook"></i>
+        </a>
+        <a class="social" href="#" target="_blank" rel="noopener" aria-label="Instagram" title="Instagram">
+          <i class="bi bi-instagram"></i>
+        </a>
+        <a class="social" href="#" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">
+          <i class="bi bi-linkedin"></i>
+        </a>
+        <a class="social" href="#" target="_blank" rel="noopener" aria-label="WhatsApp" title="WhatsApp">
+          <i class="bi bi-whatsapp"></i>
+        </a>
+      </div>
+
+      <!-- Liens -->
+      <div class="footer-links ms-3">
+        <a class="text-muted small me-3" href="{% url 'privacy_page' %}">Confidentialité</a>
+        <a class="text-muted small" href="{% url 'contact_page' %}">Contact</a>
+      </div>
+    </div>
+
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  (function(){
+    const key = "wassaya-theme";
+    const root = document.documentElement;
+    const btn = document.getElementById("themeToggle");
+
+    function setTheme(theme){
+      root.setAttribute("data-theme", theme);
+      localStorage.setItem(key, theme);
+      if(btn){
+        btn.innerHTML = theme === "dark"
+          ? '<i class="bi bi-sun"></i>'
+          : '<i class="bi bi-moon-stars"></i>';
+      }
+    }
+
+    const saved = localStorage.getItem(key);
+    if(saved){
+      setTheme(saved);
+    }else{
+      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      setTheme(prefersDark ? "dark" : "light");
+    }
+
+    if(btn){
+      btn.addEventListener("click", function(){
+        const current = root.getAttribute("data-theme") || "light";
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+    }
+  })();
+</script>
+
+{% block extra_js %}{% endblock %}
+</body>
+</html>

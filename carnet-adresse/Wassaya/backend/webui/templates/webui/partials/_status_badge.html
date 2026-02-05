@@ -1,0 +1,27 @@
+{% with s=status|upper %}
+  {% if s == "CONFIRMED" %}
+    <span class="badge rounded-pill text-bg-success">CONFIRMED</span>
+  {% elif s == "REJECTED" %}
+    <span class="badge rounded-pill text-bg-danger">REJECTED</span>
+  {% elif s == "CANCELLED" %}
+    <span class="badge rounded-pill text-bg-secondary">CANCELLED</span>
+  {% else %}
+    <span class="badge rounded-pill text-bg-warning">PENDING</span>
+  {% endif %}
+{% endwith %}
+{% if messages %}
+  <div class="container my-3">
+    {% for message in messages %}
+      <div class="alert
+        {% if message.tags == 'success' %}alert-success
+        {% elif message.tags == 'error' %}alert-danger
+        {% elif message.tags == 'warning' %}alert-warning
+        {% else %}alert-info{% endif %}
+        alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+<!-- EXPL: Ce fichier affiche un badge de statut pour un rendez-vous en fonction de son état (CONFIRMED, REJECTED, CANCELLED, PENDING) en utilisant les classes Bootstrap pour le style. -->

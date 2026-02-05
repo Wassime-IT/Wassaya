@@ -1,0 +1,308 @@
+{% extends "webui/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div>
+    <h3 class="mb-0">Mes rendez-vous (Docteur)</h3>
+    <div class="text-muted">Filtrez, triez et confirmez/refusez vos RDV.</div>
+  </div>
+</div>
+
+<!-- Quick stats -->
+<div class="row g-2 mb-3">
+  <div class="col-6 col-md-3">
+    <div class="card"><div class="card-body">
+      <div class="text-muted small"><i class="bi bi-calendar2-event me-1"></i> À venir</div>
+      <div class="fs-4 fw-semibold">{{ upcoming_page.paginator.count }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card"><div class="card-body">
+      <div class="text-muted small"><i class="bi bi-clock-history me-1"></i> Passés</div>
+      <div class="fs-4 fw-semibold">{{ past_page.paginator.count }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card"><div class="card-body">
+      <div class="text-muted small"><i class="bi bi-funnel me-1"></i> Filtre</div>
+      <div class="fw-semibold">{{ status|default:"Tous" }}</div>
+    </div></div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card"><div class="card-body">
+      <div class="text-muted small"><i class="bi bi-sort-down me-1"></i> Tri</div>
+      <div class="fw-semibold">
+        {% if sort == "date_desc" %}Date (↓){% else %}Date (↑){% endif %}
+      </div>
+    </div></div>
+  </div>
+</div>
+
+<!-- Boutons rapides -->
+<div class="d-flex flex-wrap gap-2 mb-3">
+  <a class="btn btn-outline-secondary btn-sm"
+     href="{% url 'doctor_rdvs' %}?status=&tab={{ active_tab }}&sort={{ sort }}">
+    Tous
+  </a>
+
+  <a class="btn btn-outline-warning btn-sm"
+     href="{% url 'doctor_rdvs' %}?status=PENDING&tab={{ active_tab }}&sort={{ sort }}">
+    Pending
+  </a>
+
+  <a class="btn btn-outline-success btn-sm"
+     href="{% url 'doctor_rdvs' %}?status=CONFIRMED&tab={{ active_tab }}&sort={{ sort }}">
+    Confirmed
+  </a>
+
+  <a class="btn btn-outline-danger btn-sm"
+     href="{% url 'doctor_rdvs' %}?status=REJECTED&tab={{ active_tab }}&sort={{ sort }}">
+    Rejected
+  </a>
+
+  <!-- ⚠️ au lieu de btn-outline-dark (mauvais en dark mode), on met secondary -->
+  <a class="btn btn-outline-secondary btn-sm"
+     href="{% url 'doctor_rdvs' %}?status=CANCELLED&tab={{ active_tab }}&sort={{ sort }}">
+    Cancelled
+  </a>
+</div>
+
+<!-- Filtres -->
+<form method="get" class="card mb-3">
+  <div class="card-body">
+    <input type="hidden" name="tab" value="{{ active_tab }}">
+    <div class="row g-2 align-items-end">
+      <div class="col-12 col-md-6">
+        <label class="form-label">Statut</label>
+        <select name="status" class="form-select">
+          <option value="" {% if not status %}selected{% endif %}>Tous</option>
+          <option value="PENDING" {% if status == "PENDING" %}selected{% endif %}>PENDING</option>
+          <option value="CONFIRMED" {% if status == "CONFIRMED" %}selected{% endif %}>CONFIRMED</option>
+          <option value="REJECTED" {% if status == "REJECTED" %}selected{% endif %}>REJECTED</option>
+          <option value="CANCELLED" {% if status == "CANCELLED" %}selected{% endif %}>CANCELLED</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-4">
+        <label class="form-label">Tri</label>
+        <select name="sort" class="form-select">
+          <option value="date_asc" {% if sort == "date_asc" %}selected{% endif %}>Date (↑)</option>
+          <option value="date_desc" {% if sort == "date_desc" %}selected{% endif %}>Date (↓)</option>
+        </select>
+      </div>
+
+      <div class="col-12 col-md-2 d-grid">
+        <button class="btn btn-primary" type="submit">
+          <i class="bi bi-check2 me-1"></i> Appliquer
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3">
+  <li class="nav-item">
+    <a class="nav-link {% if active_tab == 'upcoming' %}active{% endif %}"
+       href="?tab=upcoming&status={{ status }}&sort={{ sort }}">
+      <i class="bi bi-calendar2-event me-1"></i>
+      À venir ({{ upcoming_page.paginator.count }})
+    </a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link {% if active_tab == 'past' %}active{% endif %}"
+       href="?tab=past&status={{ status }}&sort={{ sort }}">
+      <i class="bi bi-clock-history me-1"></i>
+      Passés ({{ past_page.paginator.count }})
+    </a>
+  </li>
+</ul>
+
+{% if active_tab == "upcoming" %}
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in upcoming_page %}
+          <tr>
+            <td class="fw-semibold">
+              {{ r.patient.user.get_full_name|default:r.patient.user.username }}
+            </td>
+
+            <td>
+              {{ r.datetime|date:"d/m/Y H:i" }}
+              <div class="text-muted small">{{ r.datetime|timeuntil }}</div>
+            </td>
+
+            <td class="text-muted">{{ r.reason|default:"-" }}</td>
+
+            <td>
+              {% if r.status == "PENDING" %}
+                <span class="badge text-bg-warning">PENDING</span>
+              {% elif r.status == "CONFIRMED" %}
+                <span class="badge text-bg-success">CONFIRMED</span>
+              {% elif r.status == "REJECTED" %}
+                <span class="badge text-bg-danger">REJECTED</span>
+              {% elif r.status == "CANCELLED" %}
+                <span class="badge text-bg-secondary">CANCELLED</span>
+              {% else %}
+                <span class="badge text-bg-light">{{ r.status }}</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end">
+              <div class="btn-group btn-group-sm" role="group">
+                <a class="btn btn-outline-primary" href="{% url 'rdv_ics_download' r.id %}">
+                  <i class="bi bi-calendar-event me-1"></i> ICS
+                </a>
+
+                {% if r.status == "PENDING" %}
+                  <a class="btn btn-success"
+                     href="{% url 'doctor_confirm_rdv' r.id %}"
+                     onclick="return confirm('Confirmer ce rendez-vous ?');">
+                    <i class="bi bi-check2-circle me-1"></i> Confirmer
+                  </a>
+                  <a class="btn btn-outline-danger"
+                     href="{% url 'doctor_reject_rdv' r.id %}"
+                     onclick="return confirm('Refuser ce rendez-vous ?');">
+                    <i class="bi bi-x-circle me-1"></i> Refuser
+                  </a>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-muted p-4">Aucun rendez-vous à venir.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if upcoming_page.paginator.num_pages > 1 %}
+    <nav class="mt-3">
+      <ul class="pagination justify-content-center">
+        {% if upcoming_page.has_previous %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?tab=upcoming&status={{ status }}&sort={{ sort }}&page_up={{ upcoming_page.previous_page_number }}">
+              Précédent
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+        {% endif %}
+
+        <li class="page-item disabled">
+          <span class="page-link">Page {{ upcoming_page.number }} / {{ upcoming_page.paginator.num_pages }}</span>
+        </li>
+
+        {% if upcoming_page.has_next %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?tab=upcoming&status={{ status }}&sort={{ sort }}&page_up={{ upcoming_page.next_page_number }}">
+              Suivant
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+
+{% else %}
+
+  <div class="card">
+    <div class="table-responsive">
+      <table class="table align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th>Patient</th>
+            <th>Date</th>
+            <th>Motif</th>
+            <th>Statut</th>
+            <th class="text-end">Info</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for r in past_page %}
+          <tr>
+            <td class="fw-semibold">
+              {{ r.patient.user.get_full_name|default:r.patient.user.username }}
+            </td>
+
+            <td>{{ r.datetime|date:"d/m/Y H:i" }}</td>
+
+            <td class="text-muted">{{ r.reason|default:"-" }}</td>
+
+            <td>
+              {% if r.status == "PENDING" %}
+                <span class="badge text-bg-warning">PENDING</span>
+              {% elif r.status == "CONFIRMED" %}
+                <span class="badge text-bg-success">CONFIRMED</span>
+              {% elif r.status == "REJECTED" %}
+                <span class="badge text-bg-danger">REJECTED</span>
+              {% elif r.status == "CANCELLED" %}
+                <span class="badge text-bg-secondary">CANCELLED</span>
+              {% else %}
+                <span class="badge text-bg-light">{{ r.status }}</span>
+              {% endif %}
+            </td>
+
+            <td class="text-end text-muted small">
+              <i class="bi bi-archive me-1"></i> Historique
+            </td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="5" class="text-muted p-4">Aucun rendez-vous passé.</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% if past_page.paginator.num_pages > 1 %}
+    <nav class="mt-3">
+      <ul class="pagination justify-content-center">
+        {% if past_page.has_previous %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?tab=past&status={{ status }}&sort={{ sort }}&page_past={{ past_page.previous_page_number }}">
+              Précédent
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Précédent</span></li>
+        {% endif %}
+
+        <li class="page-item disabled">
+          <span class="page-link">Page {{ past_page.number }} / {{ past_page.paginator.num_pages }}</span>
+        </li>
+
+        {% if past_page.has_next %}
+          <li class="page-item">
+            <a class="page-link"
+               href="?tab=past&status={{ status }}&sort={{ sort }}&page_past={{ past_page.next_page_number }}">
+              Suivant
+            </a>
+          </li>
+        {% else %}
+          <li class="page-item disabled"><span class="page-link">Suivant</span></li>
+        {% endif %}
+      </ul>
+    </nav>
+  {% endif %}
+
+{% endif %}
+
+{% endblock %}

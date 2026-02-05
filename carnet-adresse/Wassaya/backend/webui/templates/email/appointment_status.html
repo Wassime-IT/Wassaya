@@ -1,0 +1,42 @@
+{% extends "email/base_email.html" %}
+
+{% block content %}
+  <p style="color:#333;margin:0 0 10px;">
+    Bonjour <b>{{ patient_name }}</b>,
+  </p>
+
+  <p style="color:#555;margin:0 0 14px;">
+    Le statut de votre rendez-vous a changé. Voici les détails :
+  </p>
+
+  <div style="background:#f2f6ff;border-radius:12px;padding:14px;margin:14px 0;">
+    <p style="margin:6px 0;"><b>Médecin :</b> Dr {{ doctor_name }}</p>
+    <p style="margin:6px 0;"><b>Date :</b> {{ dt }}</p>
+    <p style="margin:6px 0;"><b>Motif :</b> {{ reason|default:"-" }}</p>
+    <p style="margin:6px 0;"><b>Statut :</b> {{ status }}</p>
+  </div>
+
+  {# ✅ Afficher seulement si on a un lien ICS (donc RDV confirmé) #}
+  {% if ics_url %}
+    <p style="color:#555;margin:0 0 12px;">
+      Votre rendez-vous est confirmé. Vous pouvez l’ajouter à votre calendrier :
+    </p>
+
+    <a href="{{ ics_url }}"
+       style="display:inline-block;background:#0b5ed7;color:#ffffff!important;text-decoration:none;
+              padding:10px 14px;border-radius:10px;font-weight:800;">
+      Télécharger le fichier calendrier (ICS)
+    </a>
+
+    <p style="color:#777;margin:10px 0 0;font-size:13px;">
+      Astuce : le fichier ICS est aussi joint à cet email (si votre messagerie le permet).
+    </p>
+
+    <p style="color:#6b7280;margin:10px 0 0;font-size:12px;word-break:break-all;">
+      Si le bouton ne fonctionne pas, copiez ce lien : <br/>
+      <span>{{ ics_url }}</span>
+    </p>
+  {% endif %}
+{% endblock %}
+<!-- End of file backend/webui/templates/email/appointment_status.html -->
+ 

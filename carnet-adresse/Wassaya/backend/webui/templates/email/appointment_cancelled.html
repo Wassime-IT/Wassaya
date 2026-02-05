@@ -1,0 +1,24 @@
+{% extends "email/base_email.html" %}
+
+{% block content %}
+  <p style="color:#333;margin:0 0 10px;">
+    Bonjour <b>{{ patient_name }}</b>,
+  </p>
+
+  <p style="color:#555;margin:0 0 14px;">
+    Votre rendez-vous a été annulé.
+  </p>
+
+  <div style="background:#f2f6ff;border-radius:12px;padding:14px;margin:14px 0;">
+    <p style="margin:6px 0;"><b>Médecin :</b> Dr {{ doctor_name }}</p>
+    <p style="margin:6px 0;"><b>Date :</b> {{ dt }}</p>
+  </div>
+
+  {% if booking_url %}
+    <a href="{{ booking_url }}"
+       style="display:inline-block;background:#0b5ed7;color:#ffffff!important;text-decoration:none;
+              padding:10px 14px;border-radius:10px;font-weight:800;">
+      Prendre un nouveau RDV
+    </a>
+  {% endif %}
+{% endblock %}

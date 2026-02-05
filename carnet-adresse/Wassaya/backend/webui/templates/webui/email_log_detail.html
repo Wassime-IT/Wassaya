@@ -1,0 +1,155 @@
+{% extends "webui/base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-start flex-wrap gap-2 mb-3">
+  <div>
+    <h3 class="mb-1">Détail Email</h3>
+    <div class="text-muted">Informations techniques + lien RDV (si existant).</div>
+  </div>
+
+  <a class="btn btn-outline-secondary btn-sm" href="javascript:history.back()">
+    <i class="bi bi-arrow-left"></i> Retour
+  </a>
+</div>
+
+<div class="row g-3">
+  <div class="col-12 col-lg-7">
+    <div class="card">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+          <div>
+            <div class="text-muted small">Date</div>
+            <div class="fw-semibold">{{ log.created_at|date:"d/m/Y H:i:s" }}</div>
+          </div>
+
+          <div>
+            {% if log.status == "SENT" %}
+              <span class="badge text-bg-success">SENT</span>
+            {% else %}
+              <span class="badge text-bg-danger">FAILED</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="mb-2">
+          <div class="text-muted small">Kind</div>
+          <div><span class="badge text-bg-light">{{ log.kind }}</span></div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-muted small">To</div>
+          <div class="fw-semibold">{{ log.to_email }}</div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-muted small">Subject</div>
+          <div class="fw-semibold">{{ log.subject }}</div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-muted small">ICS</div>
+          {% if log.has_ics %}
+            <span class="badge text-bg-primary">Oui</span>
+          {% else %}
+            <span class="badge text-bg-secondary">Non</span>
+          {% endif %}
+        </div>
+
+        {% if log.template %}
+          <div class="mb-2">
+            <div class="text-muted small">Template</div>
+            <code class="small">{{ log.template }}</code>
+          </div>
+        {% endif %}
+
+        {% if log.error_message %}
+          <div class="mt-3">
+            <div class="d-flex justify-content-between align-items-center gap-2 mb-1">
+              <div class="text-muted small">Erreur</div>
+              <button type="button" class="btn btn-outline-secondary btn-sm" id="copyErrorBtn">
+                <i class="bi bi-clipboard"></i> Copier
+              </button>
+            </div>
+
+            <div class="alert alert-danger mb-0">
+              <pre id="errorText" class="mb-0 ws-prewrap">{{ log.error_message }}</pre>
+            </div>
+
+            <div id="copyToast" class="text-muted small mt-2 d-none">
+              <i class="bi bi-check2-circle me-1"></i> Copié !
+            </div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-12 col-lg-5">
+    <div class="card">
+      <div class="card-body p-4">
+        <h5 class="mb-3">RDV associé</h5>
+
+        {% if appt %}
+          <div class="small text-muted mb-2">
+            <div><b>ID RDV:</b> {{ appt.id }}</div>
+            <div><b>Date:</b> {{ appt.datetime|date:"d/m/Y H:i" }}</div>
+            <div><b>Status:</b> {{ appt.status }}</div>
+          </div>
+
+          <hr>
+
+          <div class="small text-muted">
+            <div><b>Docteur:</b> Dr {{ appt.doctor.user.get_full_name|default:appt.doctor.user.username }}</div>
+            <div><b>Patient:</b> {{ appt.patient.user.get_full_name|default:appt.patient.user.username }}</div>
+          </div>
+
+          <div class="mt-3 d-flex gap-2 flex-wrap">
+            <a class="btn btn-outline-primary btn-sm" href="/site/rdv/ics/{{ appt.id }}/">
+              <i class="bi bi-calendar-event me-1"></i> Télécharger ICS
+            </a>
+          </div>
+        {% else %}
+          <div class="text-muted">Aucun RDV lié (log système).</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function(){
+    const btn = document.getElementById("copyErrorBtn");
+    const pre = document.getElementById("errorText");
+    const toast = document.getElementById("copyToast");
+    if(!btn || !pre) return;
+
+    btn.addEventListener("click", async () => {
+      const text = pre.innerText || "";
+      try{
+        await navigator.clipboard.writeText(text);
+        if(toast){
+          toast.classList.remove("d-none");
+          setTimeout(() => toast.classList.add("d-none"), 1500);
+        }
+      }catch(e){
+        // fallback
+        const ta = document.createElement("textarea");
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand("copy");
+        ta.remove();
+        if(toast){
+          toast.classList.remove("d-none");
+          setTimeout(() => toast.classList.add("d-none"), 1500);
+        }
+      }
+    });
+  })();
+</script>
+{% endblock %}

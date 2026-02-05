@@ -1,0 +1,147 @@
+{% extends "webui/base.html" %}
+
+{% block content %}
+<div class="row g-3">
+  <!-- Colonne principale -->
+  <div class="col-12 col-lg-8">
+
+    <div class="card">
+      <div class="card-body p-4">
+
+        <div class="d-flex align-items-start justify-content-between flex-wrap gap-3">
+          <div class="d-flex gap-3 align-items-start">
+            <!-- Avatar / initiale -->
+            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center"
+                 style="width:54px;height:54px;">
+              <span class="fw-semibold text-primary" style="font-size:20px;">
+                {{ doctor.user.username|slice:":1"|upper }}
+              </span>
+            </div>
+
+            <div>
+              <h3 class="mb-1">Dr {{ doctor.user.get_full_name|default:doctor.user.username }}</h3>
+              <div class="text-muted">
+                {% if doctor.speciality %}
+                  <span class="badge text-bg-light border">{{ doctor.speciality.name }}</span>
+                {% else %}
+                  <span class="badge text-bg-light border">Spécialité non précisée</span>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+
+          <a class="btn btn-outline-secondary btn-sm" href="{% url 'doctor_list' %}">
+            <i class="bi bi-arrow-left"></i> Retour
+          </a>
+        </div>
+
+        <hr class="my-3">
+
+        <div class="row g-2">
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded-3">
+              <div class="text-muted small"><i class="bi bi-telephone me-1"></i> Téléphone</div>
+              <div class="fw-semibold">{{ doctor.phone|default:"-" }}</div>
+            </div>
+          </div>
+
+          <div class="col-12 col-md-6">
+            <div class="p-3 bg-light rounded-3">
+              <div class="text-muted small"><i class="bi bi-cash-coin me-1"></i> Tarif</div>
+              <div class="fw-semibold">{{ doctor.fee }} DH</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <h5 class="mb-2">À propos</h5>
+          {% if doctor.bio %}
+            <p class="text-muted mb-0">{{ doctor.bio }}</p>
+          {% else %}
+            <p class="text-muted mb-0">Aucune bio fournie pour le moment.</p>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card mt-3">
+      <div class="card-body p-4">
+        <h5 class="mb-2">Comment ça marche</h5>
+        <ul class="text-muted small mb-0">
+          <li>Votre demande apparaît en <b>PENDING</b> (en attente).</li>
+          <li>Le médecin peut <b>confirmer</b> ou <b>refuser</b>.</li>
+          <li>Vous recevez un email à chaque changement de statut.</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Colonne droite sticky -->
+  <div class="col-12 col-lg-4">
+    <div class="position-sticky" style="top: 90px;">
+
+      <div class="card">
+        <div class="card-body p-4">
+          <h5 class="mb-3">Prendre un rendez-vous</h5>
+
+          <div class="small text-muted mb-2">
+            <i class="bi bi-person-badge me-1"></i>
+            Dr {{ doctor.user.get_full_name|default:doctor.user.username }}
+          </div>
+
+          <div class="small text-muted mb-2">
+            <i class="bi bi-hospital me-1"></i>
+            {% if doctor.speciality %}{{ doctor.speciality.name }}{% else %}Spécialité non précisée{% endif %}
+          </div>
+
+          <div class="small text-muted mb-3">
+            <i class="bi bi-cash-coin me-1"></i>
+            Tarif : <b>{{ doctor.fee }} DH</b>
+          </div>
+
+          {% if request.user.is_authenticated and request.user.role == "PATIENT" %}
+            <a class="btn btn-primary w-100"
+               href="{% url 'patient_create_rdv' doctor.id %}">
+              <i class="bi bi-calendar-plus me-1"></i> Prendre RDV
+            </a>
+            <div class="text-muted small mt-2">
+              Vous serez notifié(e) par email quand le statut change.
+            </div>
+
+          {% elif request.user.is_authenticated and request.user.role == "DOCTOR" %}
+            <div class="alert alert-warning mb-0">
+              Vous êtes connecté en tant que <b>docteur</b>.<br>
+              Pour prendre RDV, connectez-vous comme <b>patient</b>.
+            </div>
+
+          {% else %}
+            <div class="alert alert-info">
+              Connectez-vous pour prendre un rendez-vous.
+            </div>
+
+            <a class="btn btn-outline-primary w-100" href="{% url 'login_view' %}">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+            </a>
+
+            <a class="btn btn-link w-100 mt-2" href="{% url 'register_view' %}">
+              Créer un compte
+            </a>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body p-4">
+          <h6 class="mb-2">Conseils</h6>
+          <div class="text-muted small">
+            Choisissez un créneau <b>dans le futur</b> et décrivez brièvement votre motif pour accélérer la validation.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

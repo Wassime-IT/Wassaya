@@ -1,0 +1,100 @@
+{% extends "webui/base.html" %}
+
+{% block content %}
+  <div class="row align-items-center g-4">
+    <div class="col-12 col-lg-7">
+      <div class="card">
+        <div class="card-body p-4 p-lg-5">
+          <span class="badge text-bg-primary mb-3">Wassaya Clinic</span>
+
+          <h1 class="display-6 fw-bold mb-3">
+            Prenez rendez-vous facilement avec un médecin.
+          </h1>
+
+          <p class="text-muted fs-5 mb-4">
+            Consultez la liste des médecins, choisissez un créneau, puis suivez le statut
+            (PENDING, CONFIRMED, REJECTED) en temps réel.
+          </p>
+
+          <div class="d-flex flex-column flex-sm-row gap-2">
+            <a class="btn btn-primary btn-lg" href="/site/doctors/">Trouver un médecin</a>
+
+            {% if request.user.is_authenticated %}
+              {% if request.user.role == "PATIENT" %}
+                <a class="btn btn-outline-primary btn-lg" href="/site/patient/dashboard/">Mon dashboard</a>
+              {% elif request.user.role == "DOCTOR" %}
+                <a class="btn btn-outline-primary btn-lg" href="/site/doctor/dashboard/">Mon dashboard</a>
+              {% else %}
+                <a class="btn btn-outline-primary btn-lg" href="/admin/">Admin</a>
+              {% endif %}
+            {% else %}
+              <a class="btn btn-outline-primary btn-lg" href="/site/login/">Se connecter</a>
+            {% endif %}
+          </div>
+
+          <hr class="my-4">
+
+          <div class="row g-3">
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-light rounded-3 h-100">
+                <div class="fw-bold">Rapide</div>
+                <div class="text-muted small">Réservation en quelques clics.</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-light rounded-3 h-100">
+                <div class="fw-bold">Suivi</div>
+                <div class="text-muted small">Statut clair et notifications email.</div>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-light rounded-3 h-100">
+                <div class="fw-bold">Sécurisé</div>
+                <div class="text-muted small">Accès par rôle (patient/docteur).</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-5">
+      <div class="card">
+        <div class="card-body p-4">
+          <h4 class="mb-3">Comment ça marche ?</h4>
+
+          <ol class="text-muted mb-0">
+            <li class="mb-2">
+              <b>Choisir</b> un médecin depuis la liste.
+            </li>
+            <li class="mb-2">
+              <b>Réserver</b> un rendez-vous (statut PENDING).
+            </li>
+            <li class="mb-2">
+              Le médecin <b>confirme</b> ou <b>refuse</b>.
+            </li>
+            <li>
+              Vous recevez une <b>notification email</b>.
+            </li>
+          </ol>
+
+          <div class="alert alert-info mt-4 mb-0">
+            Astuce : utilisez un email valide sur votre profil pour recevoir les notifications.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <div class="card-body p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+      <div>
+        <h5 class="mb-1">Prêt à commencer ?</h5>
+        <div class="text-muted">Accédez aux médecins disponibles et prenez rendez-vous.</div>
+      </div>
+      <a class="btn btn-primary" href="/site/doctors/">Voir les médecins</a>
+    </div>
+  </div>
+{% endblock %}
+<!-- EXPL: Page HTML d'accueil de Wassaya Clinic présentant les fonctionnalités principales et des liens vers les actions clés. -->

@@ -1,0 +1,175 @@
+{% extends "webui/base.html" %}
+{% block content %}
+
+<div class="row g-3">
+  <!-- Col gauche -->
+  <div class="col-12 col-lg-8">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="mb-0">Prendre un rendez-vous</h3>
+        <div class="text-muted">
+          Choisissez une date future. Le statut sera <span class="badge text-bg-warning">PENDING</span> jusqu’à confirmation.
+        </div>
+      </div>
+      <a class="btn btn-outline-secondary btn-sm" href="/site/doctors/{{ doctor.id }}/">
+        <i class="bi bi-arrow-left"></i> Retour
+      </a>
+    </div>
+
+    <!-- Form -->
+    <div class="card">
+      <div class="card-body p-4">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- Erreurs globales -->
+          {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <!-- Datetime -->
+          <div class="mb-3">
+            <label class="form-label">{{ form.datetime.label|default:"Date & heure" }}</label>
+            {{ form.datetime }}
+
+            {% if min_dt %}
+              <div class="form-text">
+                Minimum : <b>{{ min_dt }}</b> (heure locale)
+              </div>
+            {% endif %}
+
+            {% if form.datetime.errors %}
+              <div class="text-danger small mt-1">{{ form.datetime.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Reason -->
+          <div class="mb-3">
+            <label class="form-label">{{ form.reason.label|default:"Motif" }}</label>
+            {{ form.reason }}
+            {% if form.reason.errors %}
+              <div class="text-danger small mt-1">{{ form.reason.errors|striptags }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex flex-column flex-md-row gap-2 justify-content-between align-items-md-center">
+            <div class="text-muted small">
+              <i class="bi bi-envelope me-1"></i>
+              Email envoyé à la création + lors du changement de statut.
+            </div>
+
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-secondary" href="/site/doctors/">
+                Annuler
+              </a>
+              <button class="btn btn-primary" type="submit">
+                <i class="bi bi-calendar2-check me-1"></i> Envoyer la demande
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Slots -->
+    {% if suggested_slots %}
+      <div class="card mt-3">
+        <div class="card-body p-4">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+            <h5 class="mb-0">Créneaux suggérés</h5>
+            <div class="text-muted small">Cliquez pour remplir automatiquement la date</div>
+          </div>
+
+          <div class="d-flex flex-wrap gap-2" id="slotsWrap">
+            {% for slot in suggested_slots %}
+              <button
+                type="button"
+                class="btn btn-outline-primary btn-sm slot-btn"
+                data-iso="{{ slot|date:'Y-m-d\\TH:i' }}"
+                onclick="setSlot(this)"
+                title="Choisir ce créneau"
+              >
+                <i class="bi bi-clock me-1"></i>
+                {{ slot|date:"d/m/Y H:i" }}
+              </button>
+            {% endfor %}
+          </div>
+
+          <div class="text-muted small mt-2">
+            Si un créneau est pris, choisissez un autre créneau proposé.
+          </div>
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Conseils -->
+    <div class="card mt-3">
+      <div class="card-body p-4">
+        <h6 class="mb-2">Conseils</h6>
+        <ul class="text-muted small mb-0">
+          <li>Choisissez une date <b>dans le futur</b>.</li>
+          <li>Si le créneau est déjà pris, sélectionnez un autre horaire.</li>
+          <li>Le médecin confirmera ou refusera la demande.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Col droite -->
+  <div class="col-12 col-lg-4">
+    <div class="position-sticky" style="top: 90px;">
+      <div class="card">
+        <div class="card-body p-4">
+          <h5 class="mb-3">Médecin</h5>
+
+          <div class="mb-2">
+            <div class="fw-semibold">Dr {{ doctor.user.get_full_name|default:doctor.user.username }}</div>
+            <div class="text-muted small">
+              {% if doctor.speciality %}{{ doctor.speciality.name }}{% else %}Spécialité non précisée{% endif %}
+            </div>
+          </div>
+
+          <hr>
+
+          <div class="small text-muted">
+            <div class="mb-1"><b>Téléphone :</b> {{ doctor.phone|default:"-" }}</div>
+            <div><b>Tarif :</b> {{ doctor.fee }} DH</div>
+          </div>
+
+          {% if doctor.bio %}
+            <div class="mt-3 text-muted small">
+              {{ doctor.bio|truncatechars:160 }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="card mt-3">
+        <div class="card-body p-4">
+          <h6 class="mb-2">Statut</h6>
+          <span class="badge text-bg-warning">PENDING</span>
+          <div class="text-muted small mt-2">
+            En attente de validation par le médecin.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function setSlot(btn){
+    const iso = btn.getAttribute("data-iso");
+    const input = document.getElementById("id_datetime") || document.querySelector('input[name="datetime"]');
+    if(!input || !iso) return;
+
+    input.value = iso; // YYYY-MM-DDTHH:MM
+    input.dispatchEvent(new Event("input", { bubbles: true }));
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    input.focus();
+  }
+</script>
+
+{% endblock %}
