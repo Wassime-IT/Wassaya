@@ -126,13 +126,35 @@
 
 <!-- Background animated bubbles -->
 <div class="bg-bubbles" aria-hidden="true">
-  <span class="bubble" style="--s: 120px; --x: 8%;  --y: 20%; --dx: 35px; --dy: -25px; --d: 10s;"></span>
-  <span class="bubble" style="--s: 80px;  --x: 22%; --y: 70%; --dx: -30px; --dy: 20px; --d: 12s;"></span>
-  <span class="bubble" style="--s: 160px; --x: 78%; --y: 18%; --dx: -40px; --dy: 30px; --d: 14s;"></span>
-  <span class="bubble" style="--s: 95px;  --x: 88%; --y: 62%; --dx: 25px;  --dy: -35px; --d: 11s;"></span>
-  <span class="bubble" style="--s: 60px;  --x: 55%; --y: 40%; --dx: -22px; --dy: -18px; --d: 9s;"></span>
-  <span class="bubble" style="--s: 140px; --x: 40%; --y: 10%; --dx: 30px;  --dy: 40px; --d: 16s;"></span>
+  <span class="bubble" style="--s: 140px; --x: 6%;  --y: 12%; --dx: 40px; --dy: -30px; --d: 14s;"></span>
+  <span class="bubble" style="--s: 90px;  --x: 14%; --y: 68%; --dx: -32px; --dy: 22px;  --d: 12s;"></span>
+  <span class="bubble" style="--s: 180px; --x: 24%; --y: 28%; --dx: 30px; --dy: 35px;  --d: 18s;"></span>
+  <span class="bubble" style="--s: 70px;  --x: 30%; --y: 82%; --dx: 24px; --dy: -28px; --d: 11s;"></span>
+  <span class="bubble" style="--s: 120px; --x: 36%; --y: 18%; --dx: -28px;--dy: 26px;  --d: 16s;"></span>
+  <span class="bubble" style="--s: 60px;  --x: 42%; --y: 52%; --dx: 18px; --dy: -18px; --d: 9s;"></span>
+  <span class="bubble" style="--s: 160px; --x: 48%; --y: 86%; --dx: -36px;--dy: -22px; --d: 20s;"></span>
+  <span class="bubble" style="--s: 95px;  --x: 54%; --y: 30%; --dx: 22px; --dy: 30px;  --d: 13s;"></span>
+  <span class="bubble" style="--s: 75px;  --x: 58%; --y: 8%;  --dx: -18px;--dy: 24px;  --d: 10s;"></span>
+  <span class="bubble" style="--s: 130px; --x: 62%; --y: 62%; --dx: 34px; --dy: -26px; --d: 17s;"></span>
+  <span class="bubble" style="--s: 110px; --x: 66%; --y: 40%; --dx: -26px;--dy: 18px;  --d: 15s;"></span>
+  <span class="bubble" style="--s: 70px;  --x: 70%; --y: 78%; --dx: 20px; --dy: -20px; --d: 10s;"></span>
+
+  <span class="bubble" style="--s: 190px; --x: 76%; --y: 14%; --dx: -44px;--dy: 34px;  --d: 22s;"></span>
+  <span class="bubble" style="--s: 85px;  --x: 80%; --y: 46%; --dx: 26px; --dy: 22px;  --d: 12s;"></span>
+  <span class="bubble" style="--s: 150px; --x: 84%; --y: 74%; --dx: -30px;--dy: -30px; --d: 19s;"></span>
+  <span class="bubble" style="--s: 65px;  --x: 88%; --y: 22%; --dx: 18px; --dy: 26px;  --d: 9s;"></span>
+  <span class="bubble" style="--s: 105px; --x: 92%; --y: 56%; --dx: -22px;--dy: -24px; --d: 14s;"></span>
+  <span class="bubble" style="--s: 80px;  --x: 96%; --y: 86%; --dx: 16px; --dy: -18px; --d: 11s;"></span>
+
+  <!-- petites bulles supplémentaires (plus "vivant") -->
+  <span class="bubble" style="--s: 45px;  --x: 10%; --y: 40%; --dx: 14px; --dy: 16px;  --d: 8s;"></span>
+  <span class="bubble" style="--s: 50px;  --x: 20%; --y: 10%; --dx: -12px;--dy: 14px;  --d: 9s;"></span>
+  <span class="bubble" style="--s: 55px;  --x: 34%; --y: 36%; --dx: 16px; --dy: -14px; --d: 10s;"></span>
+  <span class="bubble" style="--s: 48px;  --x: 52%; --y: 22%; --dx: -14px;--dy: 12px;  --d: 9s;"></span>
+  <span class="bubble" style="--s: 52px;  --x: 74%; --y: 54%; --dx: 12px; --dy: -16px; --d: 10s;"></span>
+  <span class="bubble" style="--s: 46px;  --x: 90%; --y: 34%; --dx: -10px;--dy: 14px;  --d: 8s;"></span>
 </div>
+
 
 <nav class="navbar navbar-expand-lg bg-white sticky-top">
   <div class="container">
@@ -153,11 +175,6 @@
             <i class="bi bi-search me-1"></i> Médecins
           </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'about_page' %}">
-              <i class="bi bi-info-circle me-1"></i> À propos
-            </a>
-          </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'contact_page' %}">
               <i class="bi bi-envelope me-1"></i> Contact
@@ -193,16 +210,9 @@
                 <i class="bi bi-info-circle me-1"></i> À propos
               </a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'about_page' %}">
-              <i class="bi bi-info-circle me-1"></i> À propos
-            </a>
+          
           </li>
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'contact_page' %}">
-              <i class="bi bi-envelope me-1"></i> Contact
-            </a>
-          </li>
+      
 
 
         {% endif %}

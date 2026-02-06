@@ -230,3 +230,11 @@ footer.footer-compact a.social i{
 footer.footer-compact .container{
   gap: .5rem !important;
 }
+
+@media (prefers-reduced-motion: reduce){
+  .bubble{ animation: none !important; }
+}
+
+/* =========================
+   DARK MODE OVERRIDES (SUITE)
+   ========================= */

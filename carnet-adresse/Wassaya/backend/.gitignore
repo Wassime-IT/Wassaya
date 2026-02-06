@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+
+# Environnements virtuels
+venv/
+.venv/
+
+# Données utilisateurs (IMPORTANT)
+*.json
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+.DS_Store
+
+
+*.sqlite3-journal
+
+# Django / Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.venv/
+
+# SQLite
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+*.sqlite3-wal
+*.sqlite3-shm
+
+# Django static collected
+staticfiles/
+media/

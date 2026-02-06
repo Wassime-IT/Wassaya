@@ -1,5 +1,6 @@
 from django.db import models
 from wassaya_clinic.models import DoctorProfile, PatientProfile
+from django.db.models import UniqueConstraint
 
 class Appointment(models.Model):
     """
@@ -48,7 +49,17 @@ class Appointment(models.Model):
     
     reminder_24h_sent = models.BooleanField(default=False)
     reminder_1h_sent = models.BooleanField(default=False)
-    
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(fields=["doctor", "datetime"], name="uniq_doctor_slot"),
+        ]
+        indexes = [
+            models.Index(fields=["doctor", "datetime"]),
+            models.Index(fields=["patient", "datetime"]),
+            models.Index(fields=["status", "datetime"]),
+        ]
+          
 
 # EXPL: Historique des emails envoyés (global + par RDV).
 #  On stocke seulement des métadonnées (propre et léger).
